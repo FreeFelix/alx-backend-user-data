@@ -1,4 +1,4 @@
-c#!/usr/bin/env python3
+#!/usr/bin/env python3
 """Flask application for user authentication and management.
 
 This module defines a Flask web application that provides endpoints for user registration,
@@ -74,6 +74,9 @@ def logout() -> str:
         str: Redirects to the root URL or returns an error message.
     """
     session_id = request.cookies.get('session_id')
+    if not session_id:
+        abort(403)
+
     user = AUTH.get_user_from_session_id(session_id)
     if user:
         AUTH.destroy_session(user.id)
