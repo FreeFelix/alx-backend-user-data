@@ -106,12 +106,11 @@ def get_reset_password_token() -> str:
         str: JSON response with the email and reset token or an error message.
     """
     email = request.form.get('email')
-    user = AUTH.create_session(email)
-    if not user:
-        abort(403)
-    else:
+    try:
         token = AUTH.get_reset_password_token(email)
         return jsonify({"email": f"{email}", "reset_token": f"{token}"}), 200
+    except Exception:
+        abort(403)
 
 @app.route('/reset_password', methods=['PUT'], strict_slashes=False)
 def update_password() -> str:
@@ -122,9 +121,9 @@ def update_password() -> str:
     """
     email = request.form.get('email')
     reset_token = request.form.get('reset_token')
-    new_psw = request.form.get('new_password')
+    new_password = request.form.get('new_password')
     try:
-        AUTH.update_password(reset_token, new_psw)
+        AUTH.update_password(reset_token, new_password)
         return jsonify({"email": f"{email}", "message": "Password updated"}), 200
     except Exception:
         abort(403)
