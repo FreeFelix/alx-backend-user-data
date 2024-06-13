@@ -167,13 +167,14 @@ class Auth:
         Raises:
             ValueError: If no user with the given email is found.
         """
-        try:
-            user = self._db.find_user_by(email=email)
-            reset_token = _generate_uuid()
-            self._db.update_user(user.id, reset_token=reset_token)
-            return reset_token
-        except NoResultFound:
-            raise ValueError
+       email = request.form.get('email')
+    if not email:
+        abort(400, description="Email is required")
+    try:
+        token = AUTH.get_reset_password_token(email)
+        return jsonify({"email": email, "reset_token": token}), 200
+    except ValueError:
+        abort(403)
 
     def update_password(self, reset_token: str, password: str) -> None:
         """
